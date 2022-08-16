@@ -8,34 +8,21 @@ export const StorageKey = {
 
 
 export async function getStoredOptions() {
-    // try {
         const txtVal = await getFromStore(StorageKey.urlList)
         const lazyVal = await getFromStore(StorageKey.lazyLoad)
-        console.log("lazyVal in "+lazyVal)
         const localVal = await getFromStore(StorageKey.localStorage)
         const bookmarksVal = await getFromStore(StorageKey.bookmarksStorage)
         const preserveVal = await getFromStore(StorageKey.preserve)
         
-        console.log("got")
-        // const opt = await [{
-        //     txt: (txtVal === null || txtVal === void 0 ? void 0 : txtVal.txt) || '',
-        //     lazyload: (lazyVal === null || lazyVal === void 0 ? void 0 : lazyVal.lazyload) || false,
-        //     localstorage: (localVal=== null || localVal === void 0 ? void 0 : localVal.localstorage) || false,
-        //     bookmarksstorage: (bookmarksVal === null || bookmarksVal === void 0 ? void 0 : bookmarksVal.bookmarkstorage) || false,
-        //     preserve: (txtVal === null || txtVal === void 0 ? void 0 : txtVal.txt) || (preserveVal === null || preserveVal === void 0 ? void 0 : preserveVal.preserve) || false,
-        // }];  
-        // console.log("opt lazy "+opt)
+        console.log("txtVal is "+txtVal)
         return {
-            txt: txtVal|| '',
+            txt: txtVal || '',
             lazyload: lazyVal|| false,
             localstorage: localVal|| false,
             bookmarksstorage: bookmarksVal|| false,
             preserve: txtVal|| preserveVal|| false,
           };
-    // } catch (err) {
-    //     console.log(err)
-    // }
-    // console.log("lazyVal out "+lazyVal)
+
 }
 async function getFromStore(key) {
     const val = await getstoreValue(key)

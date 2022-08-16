@@ -77,7 +77,13 @@ const init = (() => {
     // onchange listener checkbox
     if (onchangecheck) {
 
+        txtArea.addEventListener("change", () => {
+            let key = StorageKey.urlList
+            let string = "txtArea"
+            let value = txtArea.value
 
+            saveAndPrint(key,string,value)
+        });
         lazyLoad.addEventListener("change", () => {
             let key = StorageKey.lazyLoad
             let string = "lazyLoad"
@@ -108,12 +114,6 @@ const init = (() => {
         });
         
     }
-    function saveAndPrint(key,string,checked){
-        console.log(`Loaded ${string}`);
-        console.log(`${string} is: ${checked}`);
-        storeValue(key, checked)
-        getstoreValue(key) 
-    }
     reload.addEventListener("click", () => {
         chrome.runtime.reload()
     });
@@ -121,6 +121,12 @@ const init = (() => {
     
 });
 
+function saveAndPrint(key,string,value){
+        console.log(`Loaded ${string}`);
+        console.log(`${string} is: ${value}`);
+        storeValue(key, value)
+        getstoreValue(key) 
+    }
 async function getFromStore(key) {
     const val = await getstoreValue(key)
     console.log("after get: "+val)
@@ -140,6 +146,8 @@ function setOpt(myOptions){
     preserve.checked = myOptions.preserve
 }
 function printOpt(myOptions) {
+    console.log()
+    console.log("Options are: ")
     const txt = myOptions.txt
     console.log("txt: "+ txt)
     const lazyLoad = myOptions.lazyload
