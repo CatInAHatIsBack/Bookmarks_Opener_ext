@@ -34,6 +34,10 @@ let txtArea = document.getElementById("urls")
 let showChange = false;
 let printButtons = true;
 let onchangecheck = true;
+
+const Save_UrlList_Debounce = 500;
+const Update_TabCount_Debouce= 50;
+
 const init = (() => {
         // async & callbacks
         // https://www.pluralsight.com/guides/javascript-callbacks-variable-scope-problem
@@ -82,7 +86,11 @@ const init = (() => {
             let string = "txtArea"
             let value = txtArea.value
 
-            saveAndPrint(key,string,value)
+            debouncedSaveUrlList();
+            
+            // debouncedUpdateTabCount(ui);
+            // saveAndPrint(key,string,value)
+
         });
         lazyLoad.addEventListener("change", () => {
             let key = StorageKey.lazyLoad
@@ -121,11 +129,34 @@ const init = (() => {
     
 });
 
+
+function debounce(func, timeout = Save_UrlList_Debounce){
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+  }
+
+
+function saveAndPrintUrl() {
+    let key = StorageKey.urlList
+    let string = "txtArea"
+    let value = txtArea.value
+    if(preserve.checked){
+        saveAndPrint(key,string,value) 
+    }
+
+}
+const debouncedSaveUrlList = debounce(() => 
+    saveAndPrintUrl()
+  );
 function saveAndPrint(key,string,value){
         console.log(`Loaded ${string}`);
         console.log(`${string} is: ${value}`);
         storeValue(key, value)
         getstoreValue(key) 
+        console.log("txt field was saved:")
     }
 async function getFromStore(key) {
     const val = await getstoreValue(key)
