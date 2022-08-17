@@ -2,7 +2,7 @@
 
 todo:
 - add debounce save url             | X
-- add debounce save tabcount        |
-- url extractor                     | 
+- add debounce save tabcount        | X
+- url extractor                     | X
 - page loader with lazyload         |
 - clean                             |
