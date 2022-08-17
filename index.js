@@ -15,6 +15,8 @@ let restore = document.getElementById("restore");
 
 let txtArea = document.getElementById("urls")
 
+let tabCountTabLabel = document.getElementById('tabcount-tab-label')
+let tabCountNumber = document.getElementById('tabcount-number')
 // const printlazykey = async () => {
 //     getstoreValue(StorageKey.lazyload)
 // }
@@ -36,7 +38,9 @@ let printButtons = true;
 let onchangecheck = true;
 
 const Save_UrlList_Debounce = 500;
-const Update_TabCount_Debouce= 50;
+const Update_TabCount_Debouce= 500;
+
+const URL_LINE_SPLIT_REGEX = /\r\n?|\n/g;
 
 const init = (() => {
         // async & callbacks
@@ -87,6 +91,7 @@ const init = (() => {
             let value = txtArea.value
 
             debouncedSaveUrlList();
+            debouncedUpdateTabCount();
             
             // debouncedUpdateTabCount(ui);
             // saveAndPrint(key,string,value)
@@ -129,8 +134,14 @@ const init = (() => {
     
 });
 
-
-function debounce(func, timeout = Save_UrlList_Debounce){
+function debounceTab(func, timeout = Update_TabCount_Debouce) {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    }; 
+}
+function debounceSave(func, timeout = Save_UrlList_Debounce){
     let timer;
     return (...args) => {
       clearTimeout(timer);
@@ -148,7 +159,27 @@ function saveAndPrintUrl() {
     }
 
 }
-const debouncedSaveUrlList = debounce(() => 
+const updateTabCount = () => {
+    let tabCount = '0';
+    if (txtArea.value) {
+      const lines = txtArea.value.split(URL_LINE_SPLIT_REGEX);
+      if (lines.length <= 5000) {
+        // limit for performance reasons
+        tabCount = String(lines.filter((line) => line.trim() !== '').length);
+      } else {
+        tabCount = '> 5000';
+      }
+      console.log("changed line count")
+    }
+  
+    tabCountNumber.textContent = tabCount;
+    tabCountTabLabel.textContent = tabCount === '1' ? 'tab' : 'tabs';
+  };
+
+const debouncedUpdateTabCount = debounceTab(() => 
+    updateTabCount()
+);
+const debouncedSaveUrlList = debounceSave(() => 
     saveAndPrintUrl()
   );
 function saveAndPrint(key,string,value){
@@ -188,6 +219,7 @@ function printOpt(myOptions) {
     const bookmarksStorage = myOptions.bookmarksstorage
     console.log("bookmarksStorage: "+ bookmarksStorage)
     const preserve = myOptions.preserve
+    console.log("val of preserve is: " + preserve)
     console.log("preserve: "+ preserve)
 }
     

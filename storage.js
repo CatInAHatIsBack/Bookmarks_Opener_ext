@@ -20,7 +20,7 @@ export async function getStoredOptions() {
             lazyload: lazyVal|| false,
             localstorage: localVal|| false,
             bookmarksstorage: bookmarksVal|| false,
-            preserve: txtVal|| preserveVal|| false,
+            preserve: preserveVal|| false,
           };
 
 }
@@ -39,8 +39,8 @@ export async function getstoreValue(key) {
     let myVal = await chrome.storage.local.get([key])
             console.log(key + ': get value is ' + myVal[key]);
             console.log(myVal[key])
-    console.log("myVal is "+myVal[key]); 
-    return await myVal[key]
+    console.log(key + ": myVal is "+myVal[key]); 
+    return  await myVal[key]
 }
 
 
