@@ -22,6 +22,7 @@ let tabCountNumber = document.getElementById('tabcount-number')
 
 let extract = document.getElementById('extract')
 let open = document.getElementById('open')
+let ext = document.getElementById('ext')
 
 // const printlazykey = async () => {
 //     getstoreValue(StorageKey.lazyload)
@@ -48,6 +49,8 @@ const Update_TabCount_Debouce= 500;
 
 const URL_LINE_SPLIT_REGEX = /\r\n?|\n/g;
 
+let hook;
+
 const init = (() => {
         // async & callbacks
         // https://www.pluralsight.com/guides/javascript-callbacks-variable-scope-problem
@@ -56,6 +59,7 @@ const init = (() => {
         // }).then(
         //     get
         // )
+    
     restore.addEventListener("click", () => {
         getMyOpt()
         
@@ -144,13 +148,80 @@ const init = (() => {
     open.addEventListener("click", () => {
         loadSites(txtArea.value, lazyLoad.checked)  
     });
-
     
+    // get hook on load
+    chrome.bookmarks.getTree(printbook);
+
+    ext.addEventListener("click", () => {
+      console.log("myBookMark: " + hook)
+      console.log("myBookMarktitle: " + hook.title)
+    });
 });
 
 
 
 // *********************************************************//
+// *********************************************************//
+// *********************************************************//
+
+function printbook(book){
+  for (var i =0; i < book.length; i++) {
+    var bookmark = book[i]
+    console.log("bookmark: " + book[i].title)
+    console.log("bookmark child: " + book[i].children)
+    if (bookmark.title === "extension_hook") {
+      
+      // sethook(bookmark)
+      hook = bookmark
+      console.log("hook: " + bookmark)
+      console.log("hooktitle: " + bookmark.title)
+
+    }
+    if(bookmark.children){
+      printbook(bookmark.children)
+    }
+  }
+}
+
+function getHook(bookmarks) {
+
+  for (var i =0; i < bookmarks.length; i++) {
+      var bookmark = bookmarks[i];
+      // console.log('len' + bookmarks.length);
+      // console.log(bookmark.title);
+      // console.log(bookmark.children);
+      if (bookmark.title === "extension_hook") {
+          var book = bookmark
+          
+          // console.log("fin");
+          // console.log("bookmark: "+ bookmark.title + " ~  " + bookmark.url);
+          res = bookmark.children;
+          console.log(res);
+      }
+
+      
+  }
+}
+function process_bookmark(bookmarks){
+  for (var i =0; i < bookmarks.length; i++) {
+    var bookmark = bookmarks[i];
+    console.log('len' + bookmarks.length);
+    console.log(bookmark.title);
+    console.log(bookmark.children);
+    if (bookmark.title === "extension_hook") {
+        var book = bookmark
+        console.log("fin");
+        console.log("bookmark: "+ bookmark.title + " ~  " + bookmark.url);
+        // res = bookmark.children;
+        // console.log();
+    }
+
+    if (bookmark.children) {
+        process_bookmark(bookmark.children);
+    }
+}
+}
+
 // *********************************************************//
 // *********************************************************//
 
