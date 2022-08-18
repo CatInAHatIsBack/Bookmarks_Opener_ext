@@ -24,6 +24,9 @@ let extract = document.getElementById('extract')
 let open = document.getElementById('open')
 let ext = document.getElementById('ext')
 
+let projectName = document.getElementById('projectName') 
+let saveToBookmarks = document.getElementById('saveToBookmarks') 
+
 // const printlazykey = async () => {
 //     getstoreValue(StorageKey.lazyload)
 // }
@@ -150,21 +153,113 @@ const init = (() => {
     });
     
     // get hook on load
-    chrome.bookmarks.getTree(printbook);
+    chrome.bookmarks.getTree(getHook);
 
     ext.addEventListener("click", () => {
       console.log("myBookMark: " + hook)
       console.log("myBookMarktitle: " + hook.title)
     });
+    saveToBookmarks.addEventListener("click", () => {
+      let val = projectName.value
+      checkForExisting(val)
+      console.log("projectName.value : " + val)
+    });
 });
 
 
+// *********************************************************//
+// *********************************************************//
+// *********************************************************//
+async function getId(parent, val) {
+  let newCreatedFolder
+  for (let i = 0; i < parent.children.length; i++) {
+    console.log(`parent.children[${i}].title is ${parent.children[i].title} and val is ${val}`)
+    if(parent.children[i].title === val){
+      newCreatedFolder = parent.children[i]
+    }
+  } 
+  return await newCreatedFolder
+}
+async function createFile(parent,url){
+  console.log("createFile: "+ parent)
+    chrome.bookmarks.create({
+      'parentId': parent.id ,
+      'url': url,
+    });
+}
+async function createFolder(parent,title){
+  await chrome.bookmarks.create(
+    {'parentId': parent.id, 'title': title}, 
+    function(newFolder) {
+      console.log("added folder: " + newFolder.title);
+    }
+  );
+}
 
-// *********************************************************//
-// *********************************************************//
-// *********************************************************//
+async function checkForExisting(val){
+  /**
+   *  scan all bookmarks
+   *  those who have children are folders
+   *  if folder name matches the current extension hook name make a folder insise with date and tome as name
+   *  else create folder with spesified name 
+   */
 
-function printbook(book){
+   let len = hook.children.length
+   console.log("hook has x children: " + len)
+   let par
+   // checks if hook exists
+   for (var i =0; i < len; i++) {
+    let hookId = hook.id
+    if(hook.children[i].title === val){
+      console.log("match: " + val)
+      // insert txt
+      par = i
+    }
+   }
+   // found hook with same name
+   // inserts urls into folder with 
+   if(par){
+    console.log("hook.children[par]: "+ hook.children[par].title)
+    // root
+    let parents = await urlsAndFolder(hook.children[par])
+    console.log("parents returned: "+parents[0])
+    await insertUrls(parents[0], parents[1])
+   }
+   else{
+    await createFolder(parent, val)
+    let id = await getId(parent, val)
+    console.log("hook.children[par]: "+ hook.children[id].title)
+    await urlsAndFolder(id)
+    await insertUrls(id)
+   }
+
+}
+async function insertUrls(parent, urls){
+  for (let i = 0; i < urls.length; i++) {
+    await createFile(parent, urls[i])
+  }  
+}
+async function urlsAndFolder(parent){
+  let urls = await txtArea.value.split(URL_LINE_SPLIT_REGEX);
+  let time = await getTime() 
+  console.log('time is: ' + time)
+  await createFolder(parent, time)
+  let newCreatedFolder = await getId(parent, time)
+  console.log("newCreatedFolder is: "+newCreatedFolder)
+  return { newCreatedFolder, urls }
+}
+
+async function getTime(){
+  var today = new Date();
+  var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+  var dateTime = date+' '+time;
+  
+  console.log(dateTime)
+  return dateTime
+}
+
+function getHook(book){
   for (var i =0; i < book.length; i++) {
     var bookmark = book[i]
     console.log("bookmark: " + book[i].title)
@@ -178,49 +273,11 @@ function printbook(book){
 
     }
     if(bookmark.children){
-      printbook(bookmark.children)
+      getHook(bookmark.children)
     }
   }
 }
 
-function getHook(bookmarks) {
-
-  for (var i =0; i < bookmarks.length; i++) {
-      var bookmark = bookmarks[i];
-      // console.log('len' + bookmarks.length);
-      // console.log(bookmark.title);
-      // console.log(bookmark.children);
-      if (bookmark.title === "extension_hook") {
-          var book = bookmark
-          
-          // console.log("fin");
-          // console.log("bookmark: "+ bookmark.title + " ~  " + bookmark.url);
-          res = bookmark.children;
-          console.log(res);
-      }
-
-      
-  }
-}
-function process_bookmark(bookmarks){
-  for (var i =0; i < bookmarks.length; i++) {
-    var bookmark = bookmarks[i];
-    console.log('len' + bookmarks.length);
-    console.log(bookmark.title);
-    console.log(bookmark.children);
-    if (bookmark.title === "extension_hook") {
-        var book = bookmark
-        console.log("fin");
-        console.log("bookmark: "+ bookmark.title + " ~  " + bookmark.url);
-        // res = bookmark.children;
-        // console.log();
-    }
-
-    if (bookmark.children) {
-        process_bookmark(bookmark.children);
-    }
-}
-}
 
 // *********************************************************//
 // *********************************************************//

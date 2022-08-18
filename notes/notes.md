@@ -6,6 +6,8 @@ todo:
 - url extractor                     | X
 - page loader with lazyload         | X
 - add bookmarks url save            |
+    - enter name
+    - saves all txt utls under ext_bookmark/name/date
 - split files                       | 
 - clean                             | 
 - write tests                       |  
