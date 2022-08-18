@@ -21,6 +21,8 @@ let tabCountNumber = document.getElementById('tabcount-number')
 
 
 let extract = document.getElementById('extract')
+let open = document.getElementById('open')
+
 // const printlazykey = async () => {
 //     getstoreValue(StorageKey.lazyload)
 // }
@@ -93,7 +95,7 @@ const init = (() => {
     // onchange listener checkbox
     if (onchangecheck) {
 
-        txtArea.addEventListener("change", () => {
+        txtArea.addEventListener("input", () => {
             let key = StorageKey.urlList
             let string = "txtArea"
             let value = txtArea.value
@@ -139,8 +141,53 @@ const init = (() => {
         chrome.runtime.reload()
     });
 
+    open.addEventListener("click", () => {
+        loadSites(txtArea.value, lazyLoad.checked)  
+    });
+
     
 });
+
+
+
+// *********************************************************//
+// *********************************************************//
+// *********************************************************//
+
+function loadSites(
+    text ,
+    lazyloading 
+  ) {
+    const urlschemes = ['http', 'https', 'file', 'view-source'];
+    let urls = text.split(URL_LINE_SPLIT_REGEX);
+  
+    for (let i = 0; i < urls.length; i++) {
+      let theurl = urls[i].trim();
+      if (theurl !== '') {
+        if (urlschemes.indexOf(theurl.split(':')[0]) === -1) {
+          theurl = 'http://' + theurl;
+        }
+        if (
+          lazyloading &&
+          theurl.split(':')[0] !== 'view-source' &&
+          theurl.split(':')[0] !== 'file'
+        ) {
+          chrome.tabs.create({
+            url: chrome.runtime.getURL('lazyloading.html#') + theurl,
+            active: false,
+          });
+        } else {
+          chrome.tabs.create({
+            url: theurl,
+            active: false,
+          });
+        }
+      }
+    }
+  }
+
+// *********************************************************//
+// *********************************************************//
 
 
 function extractURLs (text) {
