@@ -170,30 +170,26 @@ const init = (() => {
 // *********************************************************//
 // *********************************************************//
 // *********************************************************//
-async function getId(parent, val) {
-  let newCreatedFolder
-  for (let i = 0; i < parent.children.length; i++) {
-    console.log(`parent.children[${i}].title is ${parent.children[i].title} and val is ${val}`)
-    if(parent.children[i].title === val){
-      newCreatedFolder = parent.children[i]
-    }
-  } 
-  return await newCreatedFolder
-}
+// async function getId(parent, val) {
+//     for (let i = 0; i < parent.children.length; i++) {
+//       console.log(`parent.children[${i}].title is ${parent.children[i].title} and val is ${val}`)
+//       if(parent.children[i].title === val){
+//         return parent.children[i]
+//       }
+//     }  
+// }
 async function createFile(parent,url){
   console.log("createFile: "+ parent)
-    chrome.bookmarks.create({
+    return await chrome.bookmarks.create({
       'parentId': parent.id ,
       'url': url,
     });
 }
 async function createFolder(parent,title){
-  await chrome.bookmarks.create(
-    {'parentId': parent.id, 'title': title}, 
-    function(newFolder) {
-      console.log("added folder: " + newFolder.title);
-    }
-  );
+  return await chrome.bookmarks.create(
+    {'parentId': parent.id, 
+    'title': title
+  });
 }
 
 async function checkForExisting(val){
@@ -221,32 +217,39 @@ async function checkForExisting(val){
    if(par){
     console.log("hook.children[par]: "+ hook.children[par].title)
     // root
-    let parents = await urlsAndFolder(hook.children[par])
-    console.log("parents returned: "+parents[0])
-    await insertUrls(parents[0], parents[1])
+    let folder = await urlsAndFolder(hook.children[par])
+    console.log("urls and folder return if true: "+folder.title)
+    await insertUrls(folder)
    }
    else{
-    await createFolder(parent, val)
-    let id = await getId(parent, val)
-    console.log("hook.children[par]: "+ hook.children[id].title)
-    await urlsAndFolder(id)
-    await insertUrls(id)
+    let parents = await createFolder(hook, val)
+    // let folder = await getId(parent, val)
+    // console.log("hook.children[par]: "+ hook.children[id].title)
+    let folder = await urlsAndFolder(parents)
+    await insertUrls(folder)
    }
 
 }
-async function insertUrls(parent, urls){
+async function insertUrls(parent){
+  let urls = await txtArea.value.split(URL_LINE_SPLIT_REGEX);
+  console.log("urls len: "+ urls.length)
+  console.log("urls [0]" + urls[0])
+  console.log("urls title: "+ urls.title)
+  console.log("urls children: "+ urls.children)
+  console.log("urls children len: "+ urls.children.len)
   for (let i = 0; i < urls.length; i++) {
     await createFile(parent, urls[i])
   }  
 }
 async function urlsAndFolder(parent){
-  let urls = await txtArea.value.split(URL_LINE_SPLIT_REGEX);
   let time = await getTime() 
   console.log('time is: ' + time)
-  await createFolder(parent, time)
-  let newCreatedFolder = await getId(parent, time)
-  console.log("newCreatedFolder is: "+newCreatedFolder)
-  return { newCreatedFolder, urls }
+  let folder = await createFolder(parent, time)
+  console.log("folder: " + folder)
+  console.log("folder title: " + folder.title)
+  // const newCreatedFolder = await getId(parent, time)
+  // console.log("newCreatedFolder is: "+newCreatedFolder)
+  return await folder 
 }
 
 async function getTime(){
