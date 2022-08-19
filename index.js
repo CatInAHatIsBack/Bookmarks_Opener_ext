@@ -182,6 +182,7 @@ async function createFile(parent,url){
   console.log("createFile: "+ parent)
     return await chrome.bookmarks.create({
       'parentId': parent.id ,
+      'title': url,
       'url': url,
     });
 }
@@ -234,9 +235,6 @@ async function insertUrls(parent){
   let urls = await txtArea.value.split(URL_LINE_SPLIT_REGEX);
   console.log("urls len: "+ urls.length)
   console.log("urls [0]" + urls[0])
-  console.log("urls title: "+ urls.title)
-  console.log("urls children: "+ urls.children)
-  console.log("urls children len: "+ urls.children.len)
   for (let i = 0; i < urls.length; i++) {
     await createFile(parent, urls[i])
   }  
