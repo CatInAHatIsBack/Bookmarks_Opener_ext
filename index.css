@@ -72,3 +72,9 @@ input[type='checkbox'] {
 #extract {
   float: right;
 }
+#restore {
+  float: right;
+}
+#reload {
+  float: right;
+}
