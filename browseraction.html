@@ -17,33 +17,33 @@
           <strong>Open URLs</strong>
         </button>
         <button id="extract" tabindex="6">Extract URLs from text</button>
-        <button id="printlazy" tabindex="3">print lazy</button>
-        <button id="printlocal" tabindex="3">print local</button>
-        <button id="printbookmark" tabindex="3">print bookmark</button>
-        <button id="printpreserve" tabindex="3">print preserve</button>
-        <button id="reload" tabindex="3">reload</button>
-        <button id="restore" tabindex="3">restore</button>
-        <button id="ext" tabindex="3">ext</button>
+        
+       
         <span id="tabcount">
           <abbr
             title="Opening too many tabs at once may lead to long wait times or crash your browser."
           >
             &#9432;
             <span
-              >will open <span id="tabcount-number">0</span> new
-              <span id="tabcount-tab-label">tabs</span></span
+              >will open <span id="tabcountNumber">0</span> new
+              <span id="tabcountLabel">tabs</span></span
             >
           </abbr>
         </span>
       </section>
-
+      <section>
+        <button id="printlazy" tabindex="3">print lazy</button>
+        <button id="printlocal" tabindex="3">print local</button>
+        <button id="printbookmark" tabindex="3">print bookmark</button>
+        <button id="printpreserve" tabindex="3">print preserve</button>
+        <button id="restore" tabindex="3">restore</button>
+      </section>
       <section>
         <label for="projectName">Save as Name: </label>
         <input type="text" id="projectName" name="projectName">
         <button id="saveToBookmarks" tabindex="2">Save To Bookmarks</button>
+        <button id="reload" tabindex="3">reload</button>
       </section>
-
-
       <hr />
 
       <section>
@@ -60,14 +60,12 @@
           ><input type="checkbox" id="bookmarksStorage" tabindex="4" /> bookmarksStorage: Load in reverse
           order</label
         >
-        
-      </section>
-      <section>
         <label class="checkbox"
           ><input type="checkbox" id="preserve" tabindex="5" /> preserve: Preserve
           input</label
         >
       </section>
+      
     </main>
 
     <script type="module" src="./index.js"></script>

@@ -24,7 +24,7 @@ export async function getStoredOptions() {
           };
 
 }
-async function getFromStore(key) {
+export async function getFromStore(key) {
     const val = await getstoreValue(key)
     console.log("after get: "+val)
     return await val

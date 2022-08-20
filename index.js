@@ -1,31 +1,30 @@
 import {storeValue, StorageKey, getstoreValue , getStoredOptions}from "./storage.js";
+import {getUiCheckBox, getUiprintButton, getUiFunctionButton, getUiInput, getUiTabCount}from "./ui.js"
+// let lazyLoad = document.getElementById("lazyLoad");
+// let localStorage = document.getElementById("localStorage");
+// let bookmarksStorage = document.getElementById("bookmarksStorage");
+// let preserve = document.getElementById("preserve");
 
-let lazyLoad = document.getElementById("lazyLoad");
-let localStorage = document.getElementById("localStorage");
-let bookmarksStorage = document.getElementById("bookmarksStorage");
-let preserve = document.getElementById("preserve");
+// let printlazy = document.getElementById("printlazy");
+// let printlocal = document.getElementById("printlocal");
+// let printbookmark = document.getElementById("printbookmark");
+// let printpreserve = document.getElementById("printpreserve");
 
-let printlazy = document.getElementById("printlazy");
-let printlocal = document.getElementById("printlocal");
-let printbookmark = document.getElementById("printbookmark");
-let printpreserve = document.getElementById("printpreserve");
+// let reload = document.getElementById("reload");
+// let restore = document.getElementById("restore");
 
-let reload = document.getElementById("reload");
-let restore = document.getElementById("restore");
+// let txtArea = document.getElementById("urls")
 
-let txtArea = document.getElementById("urls")
-
-let tabCountVis = document.getElementById('tabcount')
-let tabCountTabLabel = document.getElementById('tabcount-tab-label')
-let tabCountNumber = document.getElementById('tabcount-number')
+// let tabCountVis = document.getElementById('tabcount')
+// let tabCountTabLabel = document.getElementById('tabcount-tab-label')
+// let tabCountNumber = document.getElementById('tabcount-number')
 
 
-let extract = document.getElementById('extract')
-let open = document.getElementById('open')
-let ext = document.getElementById('ext')
+// let extract = document.getElementById('extract')
+// let open = document.getElementById('open')
 
-let projectName = document.getElementById('projectName') 
-let saveToBookmarks = document.getElementById('saveToBookmarks') 
+// let projectName = document.getElementById('projectName') 
+// let saveToBookmarks = document.getElementById('saveToBookmarks') 
 
 // const printlazykey = async () => {
 //     getstoreValue(StorageKey.lazyload)
@@ -46,7 +45,8 @@ let saveToBookmarks = document.getElementById('saveToBookmarks')
 let showChange = false;
 let printButtons = true;
 let onchangecheck = true;
-
+let checkbox = true
+let functionbutton = true;
 const Save_UrlList_Debounce = 500;
 const Update_TabCount_Debouce= 500;
 
@@ -63,15 +63,8 @@ const init = (() => {
         //     get
         // )
     
-    restore.addEventListener("click", () => {
-        getMyOpt()
-        
-    })
-    extract.addEventListener("click", () => {
-        txtArea.value = extractURLs(txtArea.value);
-        saveAndPrintUrl()
-        updateTabCount()
-    });
+    
+    
     
     if (showChange){
         chrome.storage.onChanged.addListener(function (changes, namespace) {
@@ -85,85 +78,91 @@ const init = (() => {
     }
     // printing buttons 
     if (printButtons){
-        printlazy.addEventListener("click", () => {
+        const printButtons = getUiprintButton()
+
+        printButtons.printLazy.addEventListener("click", () => {
             getFromStore(StorageKey.lazyLoad)
         });
-        printlocal.addEventListener("click", () => {
+        printButtons.printLocal.addEventListener("click", () => {
             getFromStore(StorageKey.localStorage)
         });
-        printbookmark.addEventListener("click", () => {
+        printButtons.printBookmark.addEventListener("click", () => {
             getFromStore(StorageKey.bookmarksStorage)
         });
-        printpreserve.addEventListener("click", () => {
+        printButtons.printPreserve.addEventListener("click", () => {
             getFromStore(StorageKey.preserve)
         });
     }
 
-    // onchange listener checkbox
-    if (onchangecheck) {
-
-        txtArea.addEventListener("input", () => {
-            let key = StorageKey.urlList
-            let string = "txtArea"
-            let value = txtArea.value
+    let inputVal = getUiInput()
+    inputVal.txtArea.addEventListener("input", () => {
 
             debouncedSaveUrlList();
             debouncedUpdateTabCount();
-            
-            // debouncedUpdateTabCount(ui);
-            // saveAndPrint(key,string,value)
-
         });
-        lazyLoad.addEventListener("change", () => {
+    // onchange listener checkbox
+    if (checkbox) {
+
+        const checkBox = getUiCheckBox()
+
+        checkBox.lazyLoad.addEventListener("change", () => {
             let key = StorageKey.lazyLoad
             let string = "lazyLoad"
             let checked = lazyLoad.checked
 
             saveAndPrint(key,string,checked) 
         });
-        localStorage.addEventListener("change", () => {
+        checkBox.localStorage.addEventListener("change", () => {
             let key = StorageKey.localStorage
             let string = "localStorage"
             let checked = localStorage.checked 
 
             saveAndPrint(key,string,checked) 
         });
-        bookmarksStorage.addEventListener("change", () => {
+        checkBox.bookmarksStorage.addEventListener("change", () => {
             let key = StorageKey.bookmarksStorage
             let string = "bookmarksStorage"
             let checked = bookmarksStorage.checked
 
             saveAndPrint(key,string,checked) 
         });
-        preserve.addEventListener("change", () => {
+        checkBox.preserve.addEventListener("change", () => {
             let key = StorageKey.preserve
             let string = "preserve"
             let checked = preserve.checked
 
             saveAndPrint(key,string,checked) 
         });
-        
     }
-    reload.addEventListener("click", () => {
-        chrome.runtime.reload()
-    });
 
-    open.addEventListener("click", () => {
-        loadSites(txtArea.value, lazyLoad.checked)  
-    });
-    
     // get hook on load
     chrome.bookmarks.getTree(getHook);
 
-    ext.addEventListener("click", () => {
-      console.log("myBookMark: " + hook)
-      console.log("myBookMarktitle: " + hook.title)
+    if ( functionbutton ) {
+
+    const functionButton = getUiFunctionButton()
+
+    functionButton.open.addEventListener("click", () => {
+        loadSites(txtArea.value, lazyLoad.checked)  
     });
-    saveToBookmarks.addEventListener("click", () => {
+    functionButton.extract.addEventListener("click", () => {
+        txtArea.value = extractURLs(txtArea.value);
+        saveAndPrintUrl()
+        updateTabCount()
+    });
+    functionButton.reload.addEventListener("click", () => {
+        chrome.runtime.reload()
+    });
+    functionButton.restore.addEventListener("click", () => {
+        getMyOpt()
+    })
+    functionButton.saveToBookmarks.addEventListener("click", () => {
       let val = projectName.value
       checkForExisting(val)
       console.log("projectName.value : " + val)
     });
+    }
+   
 });
 
 
@@ -371,8 +370,8 @@ const updateTabCount = () => {
       }
       console.log("changed line count")
     }
-    tabCountVis = tabCount === '0' ? 'hidden' : 'visible'; 
     tabCountNumber.textContent = tabCount;
+    tabCountVis.style.visibility = tabCount === '0' ? 'hidden' : 'visible'; 
     tabCountTabLabel.textContent = tabCount === '1' ? 'tab' : 'tabs';
   };
 
