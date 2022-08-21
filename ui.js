@@ -30,7 +30,7 @@ export const inputKey = {
 
 export const tabCountKey = {
   tabCountVis: "tabcount",
-  tabCountTabLabel:  "tabcountLabel",
+  tabCountLabel:  "tabcountLabel",
   tabCountNumber: "tabcountNumber"
   
 }
@@ -95,13 +95,13 @@ const projectName = document.getElementById(inputKey.ProjectName)
 }
 export function getUiTabCount() {
 const tabCountVis = document.getElementById(tabCountKey.tabCountVis)
-const tabCountTabLabel = document.getElementById(tabCountKey.tabCountTabLabel)
+const tabCountLabel = document.getElementById(tabCountKey.tabCountLabel)
 const tabCountNumber = document.getElementById(tabCountKey.tabCountNumber)
 
     return {
-      tabCountVis : tabCountVis,
-      tabCountTabLabel : tabCountTabLabel,
       tabCountNumber : tabCountNumber,
+      tabCountVis : tabCountVis,
+      tabCountLabel : tabCountLabel,
     }
 
 }

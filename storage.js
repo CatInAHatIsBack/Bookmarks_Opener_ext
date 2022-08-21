@@ -8,11 +8,11 @@ export const StorageKey = {
 
 
 export async function getStoredOptions() {
-        const txtVal = await getFromStore(StorageKey.urlList)
-        const lazyVal = await getFromStore(StorageKey.lazyLoad)
-        const localVal = await getFromStore(StorageKey.localStorage)
-        const bookmarksVal = await getFromStore(StorageKey.bookmarksStorage)
-        const preserveVal = await getFromStore(StorageKey.preserve)
+        const txtVal = await getstoreValue(StorageKey.urlList)
+        const lazyVal = await getstoreValue(StorageKey.lazyLoad)
+        const localVal = await getstoreValue(StorageKey.localStorage)
+        const bookmarksVal = await getstoreValue(StorageKey.bookmarksStorage)
+        const preserveVal = await getstoreValue(StorageKey.preserve)
         
         console.log("txtVal is "+txtVal)
         return {
@@ -24,12 +24,7 @@ export async function getStoredOptions() {
           };
 
 }
-export async function getFromStore(key) {
-    const val = await getstoreValue(key)
-    console.log("after get: "+val)
-    return await val
-}
-  
+
 export async function storeValue(key, value) {
     await chrome.storage.local.set({[key]: value}, function() {
         console.log(key + ': set value to ' + value);

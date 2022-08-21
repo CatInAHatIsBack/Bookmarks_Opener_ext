@@ -1,49 +1,9 @@
-import {storeValue, StorageKey, getstoreValue , getStoredOptions}from "./storage.js";
+import {storeValue, StorageKey, getstoreValue , getStoredOptions }from "./storage.js";
 import {getUiCheckBox, getUiprintButton, getUiFunctionButton, getUiInput, getUiTabCount}from "./ui.js"
-// let lazyLoad = document.getElementById("lazyLoad");
-// let localStorage = document.getElementById("localStorage");
-// let bookmarksStorage = document.getElementById("bookmarksStorage");
-// let preserve = document.getElementById("preserve");
-
-// let printlazy = document.getElementById("printlazy");
-// let printlocal = document.getElementById("printlocal");
-// let printbookmark = document.getElementById("printbookmark");
-// let printpreserve = document.getElementById("printpreserve");
-
-// let reload = document.getElementById("reload");
-// let restore = document.getElementById("restore");
-
-// let txtArea = document.getElementById("urls")
-
-// let tabCountVis = document.getElementById('tabcount')
-// let tabCountTabLabel = document.getElementById('tabcount-tab-label')
-// let tabCountNumber = document.getElementById('tabcount-number')
 
 
-// let extract = document.getElementById('extract')
-// let open = document.getElementById('open')
-
-// let projectName = document.getElementById('projectName') 
-// let saveToBookmarks = document.getElementById('saveToBookmarks') 
-
-// const printlazykey = async () => {
-//     getstoreValue(StorageKey.lazyload)
-// }
-// const printlocalkey = async () => {
-//     await printlazykey()
-//     getstoreValue(StorageKey.localStorage)
-// }
-// const printbookmarkskey = async () => {
-//     await printlocalkey()
-//     getstoreValue(StorageKey.bookmarksStorage)
-// }
-// const printpreservekey = async () => {
-//     await printbookmarkskey()
-//     getstoreValue(StorageKey.preserve)
-    
-// }
 let showChange = false;
-let printButtons = true;
+let printbuttons = true;
 let onchangecheck = true;
 let checkbox = true
 let functionbutton = true;
@@ -54,18 +14,18 @@ const URL_LINE_SPLIT_REGEX = /\r\n?|\n/g;
 
 let hook;
 
+let inputVal
+// let txtArea = inputVal.txtArea
+let functionButton
+let tabCountInfo
 const init = (() => {
-        // async & callbacks
-        // https://www.pluralsight.com/guides/javascript-callbacks-variable-scope-problem
-        // new Promise(() => {
-        //     let myOptions = getStoredOptions()
-        // }).then(
-        //     get
-        // )
-    
-    
-    
-    
+    // get hook on load
+    chrome.bookmarks.getTree(getHook);
+    tabCountInfo = getUiTabCount()
+    console.log(tabCountInfo.tabCountNumber)
+    inputVal = getUiInput()
+    functionButton = getUiFunctionButton()
+
     if (showChange){
         chrome.storage.onChanged.addListener(function (changes, namespace) {
             for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
@@ -76,30 +36,27 @@ const init = (() => {
             }
         });
     }
+    // get hook on load
+    chrome.bookmarks.getTree(getHook);
     // printing buttons 
-    if (printButtons){
+    if (printbuttons){
         const printButtons = getUiprintButton()
 
         printButtons.printLazy.addEventListener("click", () => {
-            getFromStore(StorageKey.lazyLoad)
+            getstoreValue(StorageKey.lazyLoad)
         });
         printButtons.printLocal.addEventListener("click", () => {
-            getFromStore(StorageKey.localStorage)
+            getstoreValue(StorageKey.localStorage)
         });
         printButtons.printBookmark.addEventListener("click", () => {
-            getFromStore(StorageKey.bookmarksStorage)
+            getstoreValue(StorageKey.bookmarksStorage)
         });
         printButtons.printPreserve.addEventListener("click", () => {
-            getFromStore(StorageKey.preserve)
+            getstoreValue(StorageKey.preserve)
         });
     }
 
-    let inputVal = getUiInput()
-    inputVal.txtArea.addEventListener("input", () => {
-
-            debouncedSaveUrlList();
-            debouncedUpdateTabCount();
-        });
+    
     // onchange listener checkbox
     if (checkbox) {
 
@@ -110,12 +67,14 @@ const init = (() => {
             let string = "lazyLoad"
             let checked = lazyLoad.checked
 
+            console.log(lazyLoad)
             saveAndPrint(key,string,checked) 
         });
         checkBox.localStorage.addEventListener("change", () => {
             let key = StorageKey.localStorage
             let string = "localStorage"
-            let checked = localStorage.checked 
+            let checked = checkBox.localStorage.checked 
+            console.log(localStorage)
 
             saveAndPrint(key,string,checked) 
         });
@@ -124,23 +83,27 @@ const init = (() => {
             let string = "bookmarksStorage"
             let checked = bookmarksStorage.checked
 
+            console.log(bookmarksStorage)
             saveAndPrint(key,string,checked) 
         });
         checkBox.preserve.addEventListener("change", () => {
             let key = StorageKey.preserve
             let string = "preserve"
             let checked = preserve.checked
-
+            
+            console.log(preserve)
             saveAndPrint(key,string,checked) 
         });
     }
+    
 
-    // get hook on load
-    chrome.bookmarks.getTree(getHook);
-
+    
+    inputVal.txtArea.addEventListener("input", () => {
+            debouncedSaveUrlList();
+            debouncedUpdateTabCount();
+        });
     if ( functionbutton ) {
 
-    const functionButton = getUiFunctionButton()
 
     functionButton.open.addEventListener("click", () => {
         loadSites(txtArea.value, lazyLoad.checked)  
@@ -162,7 +125,7 @@ const init = (() => {
       console.log("projectName.value : " + val)
     });
     }
-   
+    
 });
 
 
@@ -201,7 +164,7 @@ async function checkForExisting(val){
    */
 
    let len = hook.children.length
-   console.log("hook has x children: " + len)
+  //  console.log("hook has x children: " + len)
    let par
    // checks if hook exists
    for (var i =0; i < len; i++) {
@@ -260,20 +223,22 @@ async function getTime(){
 }
 
 function getHook(book){
+  let found = false;
   for (var i =0; i < book.length; i++) {
-    var bookmark = book[i]
-    console.log("bookmark: " + book[i].title)
-    console.log("bookmark child: " + book[i].children)
-    if (bookmark.title === "extension_hook") {
-      
-      // sethook(bookmark)
-      hook = bookmark
-      console.log("hook: " + bookmark)
-      console.log("hooktitle: " + bookmark.title)
-
-    }
-    if(bookmark.children){
-      getHook(bookmark.children)
+    if (found === false){
+      var bookmark = book[i]
+      // console.log("bookmark: " + book[i].title)
+      // console.log("bookmark child: " + book[i].children)
+      if (bookmark.title === "extension_hook") {
+        found = true;
+        // sethook(bookmark)
+        hook = bookmark
+        // console.log("hook: " + bookmark)
+        // console.log("hooktitle: " + bookmark.title)
+      }
+      if(bookmark.children){
+        getHook(bookmark.children)
+      }
     }
   }
 }
@@ -360,6 +325,8 @@ function saveAndPrintUrl() {
 }
 const updateTabCount = () => {
     let tabCount = '0';
+    
+    console.log(txtArea.value)
     if (txtArea.value) {
       const lines = txtArea.value.split(URL_LINE_SPLIT_REGEX);
       if (lines.length <= 5000) {
@@ -370,9 +337,13 @@ const updateTabCount = () => {
       }
       console.log("changed line count")
     }
-    tabCountNumber.textContent = tabCount;
-    tabCountVis.style.visibility = tabCount === '0' ? 'hidden' : 'visible'; 
-    tabCountTabLabel.textContent = tabCount === '1' ? 'tab' : 'tabs';
+
+    // console.log(tabCountInfo.tabCountNumber)
+    console.log(tabCountInfo.tabCountLabel) 
+
+    tabCountInfo.tabCountNumber.textContent = tabCount;
+    tabCountInfo.tabCountVis.style.visibility = tabCount === '0' ? 'hidden' : 'visible'; 
+    tabCountInfo.tabCountLabel.textContent = tabCount === '1' ? 'tab' : 'tabs';
   };
 
 const debouncedUpdateTabCount = debounceTab(() => 
@@ -386,13 +357,8 @@ function saveAndPrint(key,string,value){
         console.log(`${string} is: ${value}`);
         storeValue(key, value)
         getstoreValue(key) 
-        console.log("txt field was saved:")
+        // console.log("txt field was saved:")
     }
-async function getFromStore(key) {
-    const val = await getstoreValue(key)
-    console.log("after get: "+val)
-}
-
 
 async function getMyOpt() {
         const myOptions = await getStoredOptions() 
@@ -421,26 +387,5 @@ function printOpt(myOptions) {
     console.log("val of preserve is: " + preserve)
     console.log("preserve: "+ preserve)
 }
-    
-  
-  
-
-// window.addEventListener('load', (event) => {
-//     console.log('page is fully loaded');
-//   });
-// window.onload = ((event) =>  {
-//     var checkbox = document.getElementById("lazyLoad"); 
-//     console.log("pf")
-//     checkbox.addEventListener('change', function() {
-//       if (this.checked) {
-//         console.log("Checkbox is checked..");
-//       } else {
-//         console.log("Checkbox is not checked..");
-//       }
-//     }); 
-//     console.log("fin")
-
-// }
-// );
 
 document.addEventListener('DOMContentLoaded', init);
