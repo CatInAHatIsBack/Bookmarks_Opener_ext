@@ -1,6 +1,6 @@
-import {storeValue, StorageKey, getstoreValue , getStoredOptions }from "./storage.js";
+import {StorageKey, getstoreValue, saveAndPrint, saveAndPrintUrl, getMyOpt, setUi, updateTabCount} from "./storage.js";
 import {getUiCheckBox, getUiprintButton, getUiFunctionButton, getUiInput, getUiTabCount}from "./ui.js"
-
+import { checkForExisting, setHook} from "./bookmarks.js"
 
 let showChange = false;
 let printbuttons = true;
@@ -15,7 +15,6 @@ const URL_LINE_SPLIT_REGEX = /\r\n?|\n/g;
 let hook;
 
 let inputVal
-// let txtArea = inputVal.txtArea
 let functionButton
 let tabCountInfo
 let checkBox 
@@ -23,11 +22,13 @@ let checkBox
 const init = (() => {
     // get hook on load
     chrome.bookmarks.getTree(getHook);
+
     tabCountInfo = getUiTabCount()
     console.log(tabCountInfo.tabCountNumber)
     inputVal = getUiInput()
     functionButton = getUiFunctionButton()
     checkBox = getUiCheckBox()
+    setUi(inputVal, tabCountInfo, checkBox)
     if (showChange){
         chrome.storage.onChanged.addListener(function (changes, namespace) {
             for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
@@ -129,107 +130,6 @@ const init = (() => {
     
 });
 
-
-// *********************************************************//
-// *********************************************************//
-// *********************************************************//
-// async function getId(parent, val) {
-//     for (let i = 0; i < parent.children.length; i++) {
-//       console.log(`parent.children[${i}].title is ${parent.children[i].title} and val is ${val}`)
-//       if(parent.children[i].title === val){
-//         return parent.children[i]
-//       }
-//     }  
-// }
-async function createFile(parent,url){
-  console.log("createFile: "+ parent)
-    return await chrome.bookmarks.create({
-      'parentId': parent.id ,
-      'title': url,
-      'url': url,
-    });
-}
-async function createFolder(parent,title){
-  return await chrome.bookmarks.create(
-    {'parentId': parent.id, 
-    'title': title
-  });
-}
-
-async function checkForExisting(val){
-  /**
-   *  scan all bookmarks
-   *  those who have children are folders
-   *  if folder name matches the current extension hook name make a folder insise with date and tome as name
-   *  else create folder with spesified name 
-   */
-
-   let len = hook.children.length
-  //  console.log("hook has x children: " + len)
-   let par
-   // checks if hook exists
-   for (var i =0; i < len; i++) {
-    let hookId = hook.id
-    if(hook.children[i].title === val){
-      console.log("match: " + val)
-      // insert txt
-      par = i
-    }
-   }
-   // found hook with same name
-   // inserts urls into folder with 
-   if(par){
-    console.log("hook.children[par]: "+ hook.children[par].title)
-    // root
-    let folder = await urlsAndFolder(hook.children[par])
-    console.log("urls and folder return if true: "+folder.title)
-    if(inputVal.txtArea.value.trim() !== ''){
-      console.log("split: "+inputVal.txtArea.value.split(' '))
-      await insertUrls(folder)
-    }
-   }
-   else{
-    let parents = await createFolder(hook, val)
-    // let folder = await getId(parent, val)
-    // console.log("hook.children[par]: "+ hook.children[id].title)
-    let folder = await urlsAndFolder(parents)
-    if(inputVal.txtArea.value.trim() !== ''){
-      console.log("split: "+inputVal.txtArea.value.split(' '))
-      await insertUrls(folder)
-    }
-    
-   }
-
-}
-async function insertUrls(parent){
-  let urls = await inputVal.txtArea.value.split(URL_LINE_SPLIT_REGEX);
-  console.log("urls len: "+ urls.length)
-  console.log("urls [0]" + urls[0])
-  for (let i = 0; i < urls.length; i++) {
-    await createFile(parent, urls[i])
-  }  
-}
-async function urlsAndFolder(parent){
-  let time = await getTime() 
-  console.log('time is: ' + time)
-  let folder = await createFolder(parent, time)
-  console.log("folder: " + folder)
-  console.log("folder title: " + folder.title)
-  // const newCreatedFolder = await getId(parent, time)
-  // console.log("newCreatedFolder is: "+newCreatedFolder)
-  return await folder 
-}
-
-async function getTime(){
-  var today = new Date();
-  var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-  var dateTime = date+' '+time;
-  
-  console.log(dateTime)
-  return dateTime
-}
-
 function getHook(book){
   let found = false;
   for (var i =0; i < book.length; i++) {
@@ -241,6 +141,7 @@ function getHook(book){
         found = true;
         // sethook(bookmark)
         hook = bookmark
+        setHook(hook, inputVal)
         // console.log("hook: " + bookmark)
         // console.log("hooktitle: " + bookmark.title)
       }
@@ -322,37 +223,8 @@ function debounceSave(func, timeout = Save_UrlList_Debounce){
   }
 
 
-function saveAndPrintUrl() {
-    let key = StorageKey.urlList
-    let string = "txtArea"
-    let value = inputVal.txtArea.value
-    if(preserve.checked){
-        saveAndPrint(key,string,value) 
-    }
 
-}
-const updateTabCount = () => {
-    let tabCount = '0';
-    
-    console.log(inputVal.txtArea.value)
-    if (inputVal.txtArea.value) {
-      const lines = inputVal.txtArea.value.split(URL_LINE_SPLIT_REGEX);
-      if (lines.length <= 5000) {
-        // limit for performance reasons
-        tabCount = String(lines.filter((line) => line.trim() !== '').length);
-      } else {
-        tabCount = '> 5000';
-      }
-      console.log("changed line count")
-    }
 
-    // console.log(tabCountInfo.tabCountNumber)
-    console.log(tabCountInfo.tabCountLabel) 
-
-    tabCountInfo.tabCountNumber.textContent = tabCount;
-    tabCountInfo.tabCountVis.style.visibility = tabCount === '0' ? 'hidden' : 'visible'; 
-    tabCountInfo.tabCountLabel.textContent = tabCount === '1' ? 'tab' : 'tabs';
-  };
 
 const debouncedUpdateTabCount = debounceTab(() => 
     updateTabCount()
@@ -360,41 +232,8 @@ const debouncedUpdateTabCount = debounceTab(() =>
 const debouncedSaveUrlList = debounceSave(() => 
     saveAndPrintUrl()
   );
-function saveAndPrint(key,string,value){
-        console.log(`Loaded ${string}`);
-        console.log(`${string} is: ${value}`);
-        storeValue(key, value)
-        getstoreValue(key) 
-        // console.log("txt field was saved:")
-    }
 
-async function getMyOpt() {
-        const myOptions = await getStoredOptions() 
-        printOpt(myOptions) 
-        setOpt(myOptions)
-        updateTabCount() 
-}
-function setOpt(myOptions){
-    inputVal.txtArea.value = myOptions.txt
-    lazyLoad.checked = myOptions.lazyload 
-    checkBox.localStorage.checked = myOptions.localstorage
-    bookmarksStorage.checked = myOptions.bookmarksstorage
-    preserve.checked = myOptions.preserve
-}
-function printOpt(myOptions) {
-    console.log()
-    console.log("Options are: ")
-    const txt = myOptions.txt
-    console.log("txt: "+ txt)
-    const lazyLoad = myOptions.lazyload
-    console.log("lazyLoad: "+ lazyLoad)
-    const localStorage = myOptions.localstorage  
-    console.log("localStorage: "+ localStorage)
-    const bookmarksStorage = myOptions.bookmarksstorage
-    console.log("bookmarksStorage: "+ bookmarksStorage)
-    const preserve = myOptions.preserve
-    console.log("val of preserve is: " + preserve)
-    console.log("preserve: "+ preserve)
-}
+
+
 
 document.addEventListener('DOMContentLoaded', init);
