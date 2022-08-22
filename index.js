@@ -18,6 +18,8 @@ let inputVal
 // let txtArea = inputVal.txtArea
 let functionButton
 let tabCountInfo
+let checkBox 
+
 const init = (() => {
     // get hook on load
     chrome.bookmarks.getTree(getHook);
@@ -25,7 +27,7 @@ const init = (() => {
     console.log(tabCountInfo.tabCountNumber)
     inputVal = getUiInput()
     functionButton = getUiFunctionButton()
-
+    checkBox = getUiCheckBox()
     if (showChange){
         chrome.storage.onChanged.addListener(function (changes, namespace) {
             for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
@@ -36,8 +38,8 @@ const init = (() => {
             }
         });
     }
-    // get hook on load
-    chrome.bookmarks.getTree(getHook);
+    
+    
     // printing buttons 
     if (printbuttons){
         const printButtons = getUiprintButton()
@@ -60,7 +62,6 @@ const init = (() => {
     // onchange listener checkbox
     if (checkbox) {
 
-        const checkBox = getUiCheckBox()
 
         checkBox.lazyLoad.addEventListener("change", () => {
             let key = StorageKey.lazyLoad
@@ -106,10 +107,10 @@ const init = (() => {
 
 
     functionButton.open.addEventListener("click", () => {
-        loadSites(txtArea.value, lazyLoad.checked)  
+        loadSites(inputVal.txtArea.value, lazyLoad.checked)  
     });
     functionButton.extract.addEventListener("click", () => {
-        txtArea.value = extractURLs(txtArea.value);
+        inputVal.txtArea.value = extractURLs(inputVal.txtArea.value);
         saveAndPrintUrl()
         updateTabCount()
     });
@@ -182,19 +183,26 @@ async function checkForExisting(val){
     // root
     let folder = await urlsAndFolder(hook.children[par])
     console.log("urls and folder return if true: "+folder.title)
-    await insertUrls(folder)
+    if(inputVal.txtArea.value.trim() !== ''){
+      console.log("split: "+inputVal.txtArea.value.split(' '))
+      await insertUrls(folder)
+    }
    }
    else{
     let parents = await createFolder(hook, val)
     // let folder = await getId(parent, val)
     // console.log("hook.children[par]: "+ hook.children[id].title)
     let folder = await urlsAndFolder(parents)
-    await insertUrls(folder)
+    if(inputVal.txtArea.value.trim() !== ''){
+      console.log("split: "+inputVal.txtArea.value.split(' '))
+      await insertUrls(folder)
+    }
+    
    }
 
 }
 async function insertUrls(parent){
-  let urls = await txtArea.value.split(URL_LINE_SPLIT_REGEX);
+  let urls = await inputVal.txtArea.value.split(URL_LINE_SPLIT_REGEX);
   console.log("urls len: "+ urls.length)
   console.log("urls [0]" + urls[0])
   for (let i = 0; i < urls.length; i++) {
@@ -317,7 +325,7 @@ function debounceSave(func, timeout = Save_UrlList_Debounce){
 function saveAndPrintUrl() {
     let key = StorageKey.urlList
     let string = "txtArea"
-    let value = txtArea.value
+    let value = inputVal.txtArea.value
     if(preserve.checked){
         saveAndPrint(key,string,value) 
     }
@@ -326,9 +334,9 @@ function saveAndPrintUrl() {
 const updateTabCount = () => {
     let tabCount = '0';
     
-    console.log(txtArea.value)
-    if (txtArea.value) {
-      const lines = txtArea.value.split(URL_LINE_SPLIT_REGEX);
+    console.log(inputVal.txtArea.value)
+    if (inputVal.txtArea.value) {
+      const lines = inputVal.txtArea.value.split(URL_LINE_SPLIT_REGEX);
       if (lines.length <= 5000) {
         // limit for performance reasons
         tabCount = String(lines.filter((line) => line.trim() !== '').length);
@@ -364,11 +372,12 @@ async function getMyOpt() {
         const myOptions = await getStoredOptions() 
         printOpt(myOptions) 
         setOpt(myOptions)
+        updateTabCount() 
 }
 function setOpt(myOptions){
-    txtArea.value = myOptions.txt
+    inputVal.txtArea.value = myOptions.txt
     lazyLoad.checked = myOptions.lazyload 
-    localStorage.checked = myOptions.localstorage
+    checkBox.localStorage.checked = myOptions.localstorage
     bookmarksStorage.checked = myOptions.bookmarksstorage
     preserve.checked = myOptions.preserve
 }
