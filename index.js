@@ -1,6 +1,9 @@
 import {StorageKey, getstoreValue, saveAndPrint, saveAndPrintUrl, getMyOpt, setUi, updateTabCount} from "./Components/storage/storage.js";
 import {getUiCheckBox, getUiprintButton, getUiFunctionButton, getUiInput, getUiTabCount}from "./Components/ui/ui.js"
 import { checkForExisting, setHook} from "./Components/bookmarks/bookmarks.js"
+import extractURLs from "./Components/extract/extract.js"
+import {loadSites} from "./Components/load/load.js"
+
 
 let showChange = false;
 let printbuttons = true;
@@ -10,7 +13,6 @@ let functionbutton = true;
 const Save_UrlList_Debounce = 500;
 const Update_TabCount_Debouce= 500;
 
-const URL_LINE_SPLIT_REGEX = /\r\n?|\n/g;
 
 let hook;
 
@@ -156,55 +158,13 @@ function getHook(book){
 // *********************************************************//
 // *********************************************************//
 
-function loadSites(
-    text ,
-    lazyloading 
-  ) {
-    const urlschemes = ['http', 'https', 'file', 'view-source'];
-    let urls = text.split(URL_LINE_SPLIT_REGEX);
-  
-    for (let i = 0; i < urls.length; i++) {
-      let theurl = urls[i].trim();
-      if (theurl !== '') {
-        if (urlschemes.indexOf(theurl.split(':')[0]) === -1) {
-          theurl = 'http://' + theurl;
-        }
-        if (
-          lazyloading &&
-          theurl.split(':')[0] !== 'view-source' &&
-          theurl.split(':')[0] !== 'file'
-        ) {
-          chrome.tabs.create({
-            url: chrome.runtime.getURL('Components/lazyLoading/lazyloading.html#') + theurl,
-            active: false,
-          });
-        } else {
-          chrome.tabs.create({
-            url: theurl,
-            active: false,
-          });
-        }
-      }
-    }
-  }
+
 
 // *********************************************************//
 // *********************************************************//
 
 
-function extractURLs (text) {
-    let urls = '';
-    let urlmatcharr;
-    const urlregex =
-      /\b((?:[a-z][\w-]+:(?:\/{1,3}|[a-z0-9%])|www\d{0,3}[.]|[a-z0-9.-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()[\]{};:'".,<>?«»“”‘’]))/gi;
-  
-    while ((urlmatcharr = urlregex.exec(text)) !== null) {
-      const match = urlmatcharr[0];
-      urls += match + '\n';
-    }
-  
-    return urls;
-  }
+
 
 
 function debounceTab(func, timeout = Update_TabCount_Debouce) {

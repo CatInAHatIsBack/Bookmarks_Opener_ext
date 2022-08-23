@@ -8,6 +8,10 @@ export function setHook(input, inputval){
 }
 async function createFile(parent,url){
     console.log("createFile: "+ parent.title)
+    console.log("substr: "+url.substring(0, 3))
+    if(url.substring(0, 3) === 'www'){
+      url = url.replace('www', 'http://www')
+    }
       return await chrome.bookmarks.create({
         'parentId': parent.id ,
         'title': url.substring()
