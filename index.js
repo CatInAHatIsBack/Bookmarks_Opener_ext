@@ -50,12 +50,12 @@ const init = (() => {
         printButtons.printLazy.addEventListener("click", () => {
             getstoreValue(StorageKey.lazyLoad)
         });
-        printButtons.printLocal.addEventListener("click", () => {
-            getstoreValue(StorageKey.localStorage)
-        });
-        printButtons.printBookmark.addEventListener("click", () => {
-            getstoreValue(StorageKey.bookmarksStorage)
-        });
+        // printButtons.printLocal.addEventListener("click", () => {
+        //     getstoreValue(StorageKey.localStorage)
+        // });
+        // printButtons.printBookmark.addEventListener("click", () => {
+        //     getstoreValue(StorageKey.bookmarksStorage)
+        // });
         printButtons.printPreserve.addEventListener("click", () => {
             getstoreValue(StorageKey.preserve)
         });
@@ -74,22 +74,22 @@ const init = (() => {
             console.log(lazyLoad)
             saveAndPrint(key,string,checked) 
         });
-        checkBox.localStorage.addEventListener("change", () => {
-            let key = StorageKey.localStorage
-            let string = "localStorage"
-            let checked = checkBox.localStorage.checked 
-            console.log(localStorage)
+        // checkBox.localStorage.addEventListener("change", () => {
+        //     let key = StorageKey.localStorage
+        //     let string = "localStorage"
+        //     let checked = checkBox.localStorage.checked 
+        //     console.log(localStorage)
 
-            saveAndPrint(key,string,checked) 
-        });
-        checkBox.bookmarksStorage.addEventListener("change", () => {
-            let key = StorageKey.bookmarksStorage
-            let string = "bookmarksStorage"
-            let checked = bookmarksStorage.checked
+        //     saveAndPrint(key,string,checked) 
+        // });
+        // checkBox.bookmarksStorage.addEventListener("change", () => {
+        //     let key = StorageKey.bookmarksStorage
+        //     let string = "bookmarksStorage"
+        //     let checked = bookmarksStorage.checked
 
-            console.log(bookmarksStorage)
-            saveAndPrint(key,string,checked) 
-        });
+        //     console.log(bookmarksStorage)
+        //     saveAndPrint(key,string,checked) 
+        // });
         checkBox.preserve.addEventListener("change", () => {
             let key = StorageKey.preserve
             let string = "preserve"

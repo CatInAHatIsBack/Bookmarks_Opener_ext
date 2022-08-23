@@ -3,6 +3,14 @@
     "description": "Build an Extension!",
     "version": "1.0",
     "manifest_version": 3,
+    "icons": {
+      "48":"./icons/icon.png"
+    },
+    "page_action": {
+      "default_icon":{
+        "48":"./icons/icon.png"
+      }
+    },
     "action": {
         "default_popup": "./browseraction.html"
       },
