@@ -10,7 +10,9 @@ async function createFile(parent,url){
     console.log("createFile: "+ parent.title)
       return await chrome.bookmarks.create({
         'parentId': parent.id ,
-        'title': url,
+        'title': url.substring()
+        .replace('http://', '')
+        .replace('https://', ''),
         'url': url,
       });
   }
@@ -54,7 +56,13 @@ export async function checkForExisting(val){
     }
    }
    else{
-    let parents = await createFolder(hook, val)
+    let parents
+    if( val.trim() === ''){
+        parents = hook 
+    }
+    else{
+        parents = await createFolder(hook, val)
+    }
     // let folder = await getId(parent, val)
     // console.log("hook.children[par]: "+ hook.children[id].title)
     let folder = await urlsAndFolder(parents)
@@ -70,7 +78,9 @@ export async function insertUrls(parent){
   console.log("urls len: "+ urls.length)
   console.log("urls [0]" + urls[0])
   for (let i = 0; i < urls.length; i++) {
-    await createFile(parent, urls[i])
+    if(urls[i].trim() !== ''){
+        await createFile(parent, urls[i])
+    }
   }  
 }
 async function urlsAndFolder(parent){

@@ -1,6 +1,6 @@
-import {StorageKey, getstoreValue, saveAndPrint, saveAndPrintUrl, getMyOpt, setUi, updateTabCount} from "./storage.js";
-import {getUiCheckBox, getUiprintButton, getUiFunctionButton, getUiInput, getUiTabCount}from "./ui.js"
-import { checkForExisting, setHook} from "./bookmarks.js"
+import {StorageKey, getstoreValue, saveAndPrint, saveAndPrintUrl, getMyOpt, setUi, updateTabCount} from "./Components/storage/storage.js";
+import {getUiCheckBox, getUiprintButton, getUiFunctionButton, getUiInput, getUiTabCount}from "./Components/ui/ui.js"
+import { checkForExisting, setHook} from "./Components/bookmarks/bookmarks.js"
 
 let showChange = false;
 let printbuttons = true;
@@ -175,7 +175,7 @@ function loadSites(
           theurl.split(':')[0] !== 'file'
         ) {
           chrome.tabs.create({
-            url: chrome.runtime.getURL('lazyloading.html#') + theurl,
+            url: chrome.runtime.getURL('Components/lazyLoading/lazyloading.html#') + theurl,
             active: false,
           });
         } else {
@@ -223,17 +223,12 @@ function debounceSave(func, timeout = Save_UrlList_Debounce){
   }
 
 
-
-
-
 const debouncedUpdateTabCount = debounceTab(() => 
     updateTabCount()
 );
 const debouncedSaveUrlList = debounceSave(() => 
     saveAndPrintUrl()
   );
-
-
 
 
 document.addEventListener('DOMContentLoaded', init);
