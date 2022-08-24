@@ -7,11 +7,11 @@ import {loadSites} from "./Components/load/load.js"
 
 let showChange = false;
 let printbuttons = true;
-let onchangecheck = true;
 let checkbox = true
 let functionbutton = true;
-const Save_UrlList_Debounce = 500;
-const Update_TabCount_Debouce= 500;
+
+const Save_UrlList_Debounce = 250;
+const Update_TabCount_Debouce= 250;
 
 
 let hook;
@@ -26,11 +26,13 @@ const init = (() => {
     chrome.bookmarks.getTree(getHook);
 
     tabCountInfo = getUiTabCount()
-    console.log(tabCountInfo.tabCountNumber)
+    // console.log(tabCountInfo.tabCountNumber)
     inputVal = getUiInput()
     functionButton = getUiFunctionButton()
     checkBox = getUiCheckBox()
     setUi(inputVal, tabCountInfo, checkBox)
+
+  
     if (showChange){
         chrome.storage.onChanged.addListener(function (changes, namespace) {
             for (let [key, { oldValue, newValue }] of Object.entries(changes)) {
@@ -74,6 +76,15 @@ const init = (() => {
             console.log(lazyLoad)
             saveAndPrint(key,string,checked) 
         });
+        
+        checkBox.preserve.addEventListener("change", () => {
+            let key = StorageKey.preserve
+            let string = "preserve"
+            let checked = preserve.checked
+            
+            console.log(preserve)
+            saveAndPrint(key,string,checked) 
+        });
         // checkBox.localStorage.addEventListener("change", () => {
         //     let key = StorageKey.localStorage
         //     let string = "localStorage"
@@ -90,14 +101,6 @@ const init = (() => {
         //     console.log(bookmarksStorage)
         //     saveAndPrint(key,string,checked) 
         // });
-        checkBox.preserve.addEventListener("change", () => {
-            let key = StorageKey.preserve
-            let string = "preserve"
-            let checked = preserve.checked
-            
-            console.log(preserve)
-            saveAndPrint(key,string,checked) 
-        });
     }
     
 
@@ -117,18 +120,19 @@ const init = (() => {
         saveAndPrintUrl()
         updateTabCount()
     });
+    
+    functionButton.saveToBookmarks.addEventListener("click", () => {
+      let val = projectName.value
+      checkForExisting(val)
+      // console.log("projectName.value : " + val)
+    });
+    }
     functionButton.reload.addEventListener("click", () => {
         chrome.runtime.reload()
     });
     functionButton.restore.addEventListener("click", () => {
         getMyOpt()
     })
-    functionButton.saveToBookmarks.addEventListener("click", () => {
-      let val = projectName.value
-      checkForExisting(val)
-      console.log("projectName.value : " + val)
-    });
-    }
     
 });
 

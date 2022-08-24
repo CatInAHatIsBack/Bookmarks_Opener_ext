@@ -1,6 +1,6 @@
 # open links
 
-todo:
+## todo:
 - add debounce save url             | X
 - add debounce save tabcount        | X
 - url extractor                     | X
@@ -8,8 +8,9 @@ todo:
 - add bookmarks url save            | X
     - enter name                
     - saves all txt utls under ext_bookmark/name/date
-- split files                       | 
+- split files                       | X
 - clean                             | 
 - write tests                       |  
 
 
+## Tests

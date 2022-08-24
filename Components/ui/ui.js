@@ -1,8 +1,8 @@
 
 export const checkBoxKey = {
     lazyLoadCheckBox: "lazyLoad",
-    localStorageCheckBox: "localStorage",
-    bookmarksStorageCheckBox: "bookmarksStorage",
+    // localStorageCheckBox: "localStorage",
+    // bookmarksStorageCheckBox: "bookmarksStorage",
     preserveCheckBox:  "preserve"
   }
 
@@ -10,8 +10,8 @@ export const checkBoxKey = {
 
 export const printButtonKey = {
   printLazy: "printlazy",
-  printLocal: "printlocal",
-  printBookmark: "printbookmark",
+  // printLocal: "printlocal",
+  // printBookmark: "printbookmark",
   printPreserve:  "printpreserve"
   }
 
@@ -53,15 +53,15 @@ const preserve = document.getElementById(checkBoxKey.preserveCheckBox);
 }
 export function getUiprintButton() {
 const printLazy = document.getElementById(printButtonKey.printLazy);
-const printLocal = document.getElementById(printButtonKey.printLocal);
-const printBookmark = document.getElementById(printButtonKey.printBookmark);
+// const printLocal = document.getElementById(printButtonKey.printLocal);
+// const printBookmark = document.getElementById(printButtonKey.printBookmark);
 const printPreserve = document.getElementById(printButtonKey.printPreserve);
 
 
     return {
       printLazy : printLazy,
-      printLocal : printLocal,
-      printBookmark : printBookmark,
+      // printLocal : printLocal,
+      // printBookmark : printBookmark,
       printPreserve : printPreserve,
     }
 

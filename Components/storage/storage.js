@@ -9,24 +9,24 @@ const URL_LINE_SPLIT_REGEX = /\r\n?|\n/g;
 export const StorageKey = {
     urlList: 'urls',
     lazyLoad: "lazyload",
-    localStorage: "localstorage",
-    bookmarksStorage: "bookmarkstorage",
+    // localStorage: "localstorage",
+    // bookmarksStorage: "bookmarkstorage",
     preserve:  "preserve"
   }
 
 export async function getStoredOptions() {
         const txtVal = await getstoreValue(StorageKey.urlList)
         const lazyVal = await getstoreValue(StorageKey.lazyLoad)
-        const localVal = await getstoreValue(StorageKey.localStorage)
-        const bookmarksVal = await getstoreValue(StorageKey.bookmarksStorage)
+        // const localVal = await getstoreValue(StorageKey.localStorage)
+        // const bookmarksVal = await getstoreValue(StorageKey.bookmarksStorage)
         const preserveVal = await getstoreValue(StorageKey.preserve)
         
         console.log("txtVal is "+txtVal)
         return {
             txt: txtVal || '',
             lazyload: lazyVal|| false,
-            localstorage: localVal|| false,
-            bookmarksstorage: bookmarksVal|| false,
+            // localstorage: localVal|| false,
+            // bookmarksstorage: bookmarksVal|| false,
             preserve: preserveVal|| false,
           };
 
@@ -44,17 +44,17 @@ export async function storeValue(key, value) {
 }
 export async function getstoreValue(key) {
     let myVal = await chrome.storage.local.get([key])
-            console.log(key + ': get value is ' + myVal[key]);
-            console.log(myVal[key])
-    console.log(key + ": myVal is "+myVal[key]); 
+      console.log(key + ': get value is ' + myVal[key]);
+    // console.log(myVal[key])
+    // console.log(key + ": myVal is "+myVal[key]); 
     return  await myVal[key]
 }
 
 export function setOpt(myOptions){
     inputVal.txtArea.value = myOptions.txt
     lazyLoad.checked = myOptions.lazyload 
-    checkBox.localStorage.checked = myOptions.localstorage
-    bookmarksStorage.checked = myOptions.bookmarksstorage
+    // checkBox.localStorage.checked = myOptions.localstorage
+    // bookmarksStorage.checked = myOptions.bookmarksstorage
     preserve.checked = myOptions.preserve
 }
 export function printOpt(myOptions) {
@@ -64,12 +64,12 @@ export function printOpt(myOptions) {
     console.log("txt: "+ txt)
     const lazyLoad = myOptions.lazyload
     console.log("lazyLoad: "+ lazyLoad)
-    const localStorage = myOptions.localstorage  
-    console.log("localStorage: "+ localStorage)
-    const bookmarksStorage = myOptions.bookmarksstorage
-    console.log("bookmarksStorage: "+ bookmarksStorage)
+    // const localStorage = myOptions.localstorage  
+    // console.log("localStorage: "+ localStorage)
+    // const bookmarksStorage = myOptions.bookmarksstorage
+    // console.log("bookmarksStorage: "+ bookmarksStorage)
     const preserve = myOptions.preserve
-    console.log("val of preserve is: " + preserve)
+    // console.log("val of preserve is: " + preserve)
     console.log("preserve: "+ preserve)
 }
 export function saveAndPrint(key,string,value){
@@ -96,7 +96,7 @@ export async function getMyOpt() {
 export const updateTabCount = () => {
     let tabCount = '0';
     
-    console.log(inputVal.txtArea.value)
+    // console.log(inputVal.txtArea.value)
     if (inputVal.txtArea.value) {
       const lines = inputVal.txtArea.value.split(URL_LINE_SPLIT_REGEX);
       if (lines.length <= 5000) {
@@ -104,12 +104,13 @@ export const updateTabCount = () => {
         tabCount = String(lines.filter((line) => line.trim() !== '').length);
       } else {
         tabCount = '> 5000';
+        console.log("too many urls")
       }
       console.log("changed line count")
     }
 
     // console.log(tabCountInfo.tabCountNumber)
-    console.log(tabCountInfo.tabCountLabel) 
+    // console.log(tabCountInfo.tabCountLabel) 
 
     tabCountInfo.tabCountNumber.textContent = tabCount;
     tabCountInfo.tabCountVis.style.visibility = tabCount === '0' ? 'hidden' : 'visible'; 

@@ -7,8 +7,8 @@ export function setHook(input, inputval){
     inputVal = inputval
 }
 async function createFile(parent,url){
-    console.log("createFile: "+ parent.title)
-    console.log("substr: "+url.substring(0, 3))
+    // console.log("createFile: "+ parent.title)
+    // console.log("substr: "+url.substring(0, 3))
     if(url.substring(0, 3) === 'www'){
       url = url.replace('www', 'http://www')
     }
@@ -42,7 +42,7 @@ export async function checkForExisting(val){
    for (var i =0; i < len; i++) {
     let hookId = hook.id
     if(hook.children[i].title === val){
-      console.log("match: " + val)
+      // console.log("match: " + val)
       // insert txt
       par = i
     }
@@ -50,12 +50,12 @@ export async function checkForExisting(val){
    // found hook with same name
    // inserts urls into folder with 
    if(par){
-    console.log("hook.children[par]: "+ hook.children[par].title)
+    // console.log("hook.children[par]: "+ hook.children[par].title)
     // root
     let folder = await urlsAndFolder(hook.children[par])
-    console.log("urls and folder return if true: "+folder.title)
+    // console.log("urls and folder return if true: "+folder.title)
     if(inputVal.txtArea.value.trim() !== ''){
-      console.log("split: "+inputVal.txtArea.value.split(' '))
+      // console.log("split: "+inputVal.txtArea.value.split(' '))
       await insertUrls(folder)
     }
    }
@@ -71,7 +71,7 @@ export async function checkForExisting(val){
     // console.log("hook.children[par]: "+ hook.children[id].title)
     let folder = await urlsAndFolder(parents)
     if(inputVal.txtArea.value.trim() !== ''){
-      console.log("split: "+inputVal.txtArea.value.split(' '))
+      // console.log("split: "+inputVal.txtArea.value.split(' '))
       await insertUrls(folder)
     }
     
@@ -79,8 +79,8 @@ export async function checkForExisting(val){
 }
 export async function insertUrls(parent){
   let urls = await inputVal.txtArea.value.split(URL_LINE_SPLIT_REGEX);
-  console.log("urls len: "+ urls.length)
-  console.log("urls [0]" + urls[0])
+  // console.log("urls len: "+ urls.length)
+  // console.log("urls [0]" + urls[0])
   for (let i = 0; i < urls.length; i++) {
     if(urls[i].trim() !== ''){
         await createFile(parent, urls[i])
@@ -89,10 +89,10 @@ export async function insertUrls(parent){
 }
 async function urlsAndFolder(parent){
   let time = await getTime() 
-  console.log('time is: ' + time)
+  // console.log('time is: ' + time)
   let folder = await createFolder(parent, time)
-  console.log("folder: " + folder)
-  console.log("folder title: " + folder.title)
+  // console.log("folder: " + folder)
+  // console.log("folder title: " + folder.title)
   // const newCreatedFolder = await getId(parent, time)
   // console.log("newCreatedFolder is: "+newCreatedFolder)
   return await folder 
