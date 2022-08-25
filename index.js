@@ -1,4 +1,4 @@
-import {StorageKey, getstoreValue, saveAndPrint, saveAndPrintUrl, getMyOpt, setUi, updateTabCount} from "./Components/storage/storage.js";
+import {StorageKey, getstoreValue, saveAndPrint, getMyOpt, setUi, updateTabCount} from "./Components/storage/storage.js";
 import {getUiCheckBox, getUiprintButton, getUiFunctionButton, getUiInput, getUiTabCount}from "./Components/ui/ui.js"
 import { checkForExisting, setHook} from "./Components/bookmarks/bookmarks.js"
 import extractURLs from "./Components/extract/extract.js"
@@ -26,10 +26,10 @@ const init = (() => {
     chrome.bookmarks.getTree(getHook);
 
     tabCountInfo = getUiTabCount()
-    // console.log(tabCountInfo.tabCountNumber)
     inputVal = getUiInput()
     functionButton = getUiFunctionButton()
     checkBox = getUiCheckBox()
+
     setUi(inputVal, tabCountInfo, checkBox)
 
   
@@ -52,12 +52,6 @@ const init = (() => {
         printButtons.printLazy.addEventListener("click", () => {
             getstoreValue(StorageKey.lazyLoad)
         });
-        // printButtons.printLocal.addEventListener("click", () => {
-        //     getstoreValue(StorageKey.localStorage)
-        // });
-        // printButtons.printBookmark.addEventListener("click", () => {
-        //     getstoreValue(StorageKey.bookmarksStorage)
-        // });
         printButtons.printPreserve.addEventListener("click", () => {
             getstoreValue(StorageKey.preserve)
         });
@@ -67,40 +61,17 @@ const init = (() => {
     // onchange listener checkbox
     if (checkbox) {
 
-
         checkBox.lazyLoad.addEventListener("change", () => {
-            let key = StorageKey.lazyLoad
             let string = "lazyLoad"
-            let checked = lazyLoad.checked
 
-            console.log(lazyLoad)
-            saveAndPrint(key,string,checked) 
+            saveAndPrint(string) 
         });
         
         checkBox.preserve.addEventListener("change", () => {
-            let key = StorageKey.preserve
             let string = "preserve"
-            let checked = preserve.checked
             
-            console.log(preserve)
-            saveAndPrint(key,string,checked) 
+            saveAndPrint(string) 
         });
-        // checkBox.localStorage.addEventListener("change", () => {
-        //     let key = StorageKey.localStorage
-        //     let string = "localStorage"
-        //     let checked = checkBox.localStorage.checked 
-        //     console.log(localStorage)
-
-        //     saveAndPrint(key,string,checked) 
-        // });
-        // checkBox.bookmarksStorage.addEventListener("change", () => {
-        //     let key = StorageKey.bookmarksStorage
-        //     let string = "bookmarksStorage"
-        //     let checked = bookmarksStorage.checked
-
-        //     console.log(bookmarksStorage)
-        //     saveAndPrint(key,string,checked) 
-        // });
     }
     
 
@@ -124,7 +95,6 @@ const init = (() => {
     functionButton.saveToBookmarks.addEventListener("click", () => {
       let val = projectName.value
       checkForExisting(val)
-      // console.log("projectName.value : " + val)
     });
     }
     functionButton.reload.addEventListener("click", () => {
@@ -141,15 +111,11 @@ function getHook(book){
   for (var i =0; i < book.length; i++) {
     if (found === false){
       var bookmark = book[i]
-      // console.log("bookmark: " + book[i].title)
-      // console.log("bookmark child: " + book[i].children)
       if (bookmark.title === "extension_hook") {
         found = true;
         // sethook(bookmark)
         hook = bookmark
         setHook(hook, inputVal)
-        // console.log("hook: " + bookmark)
-        // console.log("hooktitle: " + bookmark.title)
       }
       if(bookmark.children){
         getHook(bookmark.children)
@@ -161,13 +127,6 @@ function getHook(book){
 
 // *********************************************************//
 // *********************************************************//
-
-
-
-// *********************************************************//
-// *********************************************************//
-
-
 
 
 
@@ -191,7 +150,7 @@ const debouncedUpdateTabCount = debounceTab(() =>
     updateTabCount()
 );
 const debouncedSaveUrlList = debounceSave(() => 
-    saveAndPrintUrl()
+    saveAndPrint("txtArea")
   );
 
 
